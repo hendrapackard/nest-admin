@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+
+  # Nodejs
+  backend:
+    build: .
+    container_name: nest-admin
+    environment:
+      - TZ=Asia/Jakarta
+    ports:
+      - 8000:3000
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    command: 'npm run start:dev '
+
+  # PostgreSQL Service
+  postgres:
+    image: postgres:12.2-alpine
+    container_name: nest-admin-db
+    restart: always
+    environment:
+      - POSTGRES_DB=nest_admin
+      - POSTGRES_USER=nest_admin_user
+      - POSTGRES_PASSWORD=nest_admin_password
+    volumes:
+      - ~/docker-volumes/db/postgresql-12-2/nest-admin:/var/lib/postgresql/data
+    ports:
+      - 5434:5432
+
