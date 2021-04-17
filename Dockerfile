@@ -16,3 +16,5 @@ RUN npm install
 # Copy all the other files
 COPY . .
 
+#Install nestjs globally via npm
+RUN npm i -g @nestjs/cli
