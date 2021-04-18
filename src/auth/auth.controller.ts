@@ -15,6 +15,10 @@ export class AuthController {
             throw new BadRequestException(['password do not match'])
         }
 
+        if (await this.userService.findOne({email: body.email})) {
+            throw new BadRequestException(['email has already been taken'])
+        }
+
         const hashed = await bcrypt.hash(body.password, 12);
 
         return this.userService.create({
