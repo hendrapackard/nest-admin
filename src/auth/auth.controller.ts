@@ -1,6 +1,7 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {BadRequestException, Body, Controller, Post} from '@nestjs/common';
 import {UserService} from "../user/user.service";
 import * as bcrypt from 'bcrypt';
+import {RegisterDto} from "./models/register.dto";
 
 @Controller()
 export class AuthController {
@@ -9,7 +10,11 @@ export class AuthController {
     }
 
     @Post('register')
-    async register(@Body() body) {
+    async register(@Body() body: RegisterDto) {
+        if (body.email !== body.password_confirm) {
+            throw new BadRequestException(['password do not match'])
+        }
+
         const hashed = await bcrypt.hash(body.password, 12);
 
         return this.userService.create({
