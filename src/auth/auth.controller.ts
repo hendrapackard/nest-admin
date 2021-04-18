@@ -11,7 +11,7 @@ export class AuthController {
 
     @Post('register')
     async register(@Body() body: RegisterDto) {
-        if (body.email !== body.password_confirm) {
+        if (body.password !== body.password_confirm) {
             throw new BadRequestException(['password do not match'])
         }
 
