@@ -56,10 +56,6 @@ export class AuthController {
     ) {
         const user = await this.userService.findOne({email});
 
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-
         if (!await bcrypt.compare(password, user.password)) {
             throw new BadRequestException('Invalid credentials');
         }

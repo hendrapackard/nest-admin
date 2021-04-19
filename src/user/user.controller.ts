@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     ClassSerializerInterceptor,
     Controller,
@@ -29,6 +30,10 @@ export class UserController {
 
     @Post()
     async create(@Body() body: UserCreateDto): Promise<User> {
+        if (await this.userService.findOne({email: body.email})) {
+            throw new BadRequestException(['email has already been taken']);
+        }
+
         const password = await bcrypt.hash('1234', 12);
         return this.userService.create({
             first_name: body.first_name,
