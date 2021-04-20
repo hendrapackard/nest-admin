@@ -18,11 +18,23 @@ export class UserService {
         return this.userRepository.save(data);
     }
 
-    async findOne(condition): Promise<User> {
+    async findOneOrNotFound(condition): Promise<User> {
         const user = await this.userRepository.findOne(condition);
         if (!user) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException('Data not found');
         }
         return user;
+    }
+
+    async findOne(condition): Promise<User> {
+        return this.userRepository.findOne(condition);
+    }
+
+    async update(id: number, data): Promise<any> {
+        return this.userRepository.update(id, data);
+    }
+
+    async delete(id: number): Promise<any> {
+        return this.userRepository.delete(id);
     }
 }
