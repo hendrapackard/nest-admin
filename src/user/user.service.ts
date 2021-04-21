@@ -41,11 +41,11 @@ export class UserService {
     }
 
     async findOneOrNotFound(condition): Promise<User> {
-        const user = await this.userRepository.findOne(condition);
-        if (!user) {
+        const data = await this.userRepository.findOne(condition);
+        if (!data) {
             throw new NotFoundException('Data not found');
         }
-        return user;
+        return data;
     }
 
     async findOne(condition): Promise<User> {

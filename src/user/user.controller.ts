@@ -2,10 +2,13 @@ import {
     BadRequestException,
     Body,
     ClassSerializerInterceptor,
-    Controller, Delete,
+    Controller,
+    Delete,
     Get,
     Param,
-    Post, Put, Query,
+    Post,
+    Put,
+    Query,
     UseGuards,
     UseInterceptors
 } from '@nestjs/common';
@@ -14,7 +17,6 @@ import {User} from "./models/user.entity";
 import * as bcrypt from 'bcrypt';
 import {UserCreateDto} from "./models/user-create.dto";
 import {AuthGuard} from "../auth/auth.guard";
-import {UserUpdateDto} from "./models/user-update.dto";
 import {Not} from "typeorm";
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -53,7 +55,7 @@ export class UserController {
     @Put(':id')
     async update(
         @Param('id') id: number,
-        @Body() body: UserUpdateDto
+        @Body() body: UserCreateDto
     ) {
         await this.userService.findOneOrNotFound({id});
 

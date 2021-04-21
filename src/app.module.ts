@@ -5,6 +5,7 @@ import {UserModule} from './user/user.module';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthModule} from './auth/auth.module';
 import {CommonModule} from './common/common.module';
+import {RoleModule} from './role/role.module';
 
 @Module({
     imports: [
@@ -20,7 +21,8 @@ import {CommonModule} from './common/common.module';
             synchronize: true,
         }),
         AuthModule,
-        CommonModule
+        CommonModule,
+        RoleModule
     ],
     controllers: [AppController],
     providers: [AppService],

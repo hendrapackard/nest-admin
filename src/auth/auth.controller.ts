@@ -4,7 +4,6 @@ import {
     ClassSerializerInterceptor,
     Controller,
     Get,
-    NotFoundException,
     Post,
     Req,
     Res,
@@ -17,6 +16,7 @@ import {RegisterDto} from "./models/register.dto";
 import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 import {AuthGuard} from "./auth.guard";
+import {LoginDto} from "./models/login.dto";
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
@@ -50,13 +50,12 @@ export class AuthController {
 
     @Post('login')
     async login(
-        @Body('email') email: string,
-        @Body('password') password: string,
+        @Body() body: LoginDto,
         @Res({passthrough: true}) response: Response
     ) {
-        const user = await this.userService.findOne({email});
+        const user = await this.userService.findOneOrNotFound({email: body.email});
 
-        if (!await bcrypt.compare(password, user.password)) {
+        if (!await bcrypt.compare(body.password, user.password)) {
             throw new BadRequestException('Invalid credentials');
         }
 
