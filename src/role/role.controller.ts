@@ -19,7 +19,10 @@ export class RoleController {
             throw new BadRequestException(['name has already been taken']);
         }
 
-        return this.roleService.create(body)
+        return this.roleService.create({
+            name: body.name,
+            permissions: body.permissions.map(id => ({id}))
+        })
     }
 
     @Get(':id')
@@ -38,9 +41,16 @@ export class RoleController {
             throw new BadRequestException(['name has already been taken']);
         }
 
-        await this.roleService.update(id, body);
+        await this.roleService.update(id, {
+            name: body.name
+        });
 
-        return this.roleService.findOne({id});
+        const data = await this.roleService.findOne({id});
+
+        return this.roleService.create({
+            ...data,
+            permissions: body.permissions.map(id => ({id}))
+        });
     }
 
     @Delete(':id')

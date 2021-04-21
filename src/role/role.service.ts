@@ -19,7 +19,7 @@ export class RoleService {
     }
 
     async findOneOrNotFound(condition): Promise<Role> {
-        const data = await this.roleRepository.findOne(condition);
+        const data = await this.roleRepository.findOne(condition, {relations: ['permissions']});
         if (!data) {
             throw new NotFoundException('Data not found');
         }
