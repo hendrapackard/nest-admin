@@ -17,6 +17,7 @@ import {JwtService} from "@nestjs/jwt";
 import {Request, Response} from "express";
 import {AuthGuard} from "./auth.guard";
 import {LoginDto} from "./models/login.dto";
+import {RoleService} from "../role/role.service";
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
@@ -24,6 +25,7 @@ export class AuthController {
 
     constructor(
         private userService: UserService,
+        private roleService: RoleService,
         private jwtService: JwtService
     ) {
     }
@@ -34,17 +36,20 @@ export class AuthController {
             throw new BadRequestException(['password do not match']);
         }
 
-        if (await this.userService.findOneOrNotFound({email: body.email})) {
+        if (await this.userService.findOne({email: body.email})) {
             throw new BadRequestException(['email has already been taken']);
         }
 
         const hashed = await bcrypt.hash(body.password, 12);
+
+        const roleAdmin = await this.roleService.findOne({name: 'Admin'})
 
         return this.userService.create({
             first_name: body.first_name,
             last_name: body.last_name,
             email: body.email,
             password: hashed,
+            role: {id: roleAdmin.id}
         });
     }
 

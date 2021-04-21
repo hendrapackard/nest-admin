@@ -38,12 +38,13 @@ export class UserController {
             throw new BadRequestException(['email has already been taken']);
         }
 
-        const password = await bcrypt.hash('1234', 12);
+        const {role_id, ...data} = body;
+
+        const password = await bcrypt.hash('Secret123!', 12);
         return this.userService.create({
-            first_name: body.first_name,
-            last_name: body.last_name,
-            email: body.email,
-            password
+            ...data,
+            password,
+            role: {id: role_id}
         });
     }
 
@@ -63,7 +64,12 @@ export class UserController {
             throw new BadRequestException(['email has already been taken']);
         }
 
-        await this.userService.update(id, body);
+        const {role_id, ...data} = body;
+
+        await this.userService.update(id, {
+            ...data,
+            role: {id: role_id}
+        });
 
         return this.userService.findOne({id});
     }
