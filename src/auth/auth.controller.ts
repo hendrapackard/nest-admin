@@ -18,6 +18,7 @@ import {Request, Response} from "express";
 import {AuthGuard} from "./auth.guard";
 import {LoginDto} from "./models/login.dto";
 import {RoleService} from "../role/role.service";
+import {AuthService} from "./auth.service";
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
@@ -26,7 +27,8 @@ export class AuthController {
     constructor(
         private userService: UserService,
         private roleService: RoleService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private authService: AuthService
     ) {
     }
 
@@ -74,11 +76,9 @@ export class AuthController {
     @UseGuards(AuthGuard)
     @Get('user')
     async user(@Req() request: Request) {
-        const cookie = request.cookies['jwt'];
+        const id = await this.authService.userId(request);
 
-        const data = await this.jwtService.verifyAsync(cookie);
-
-        return this.userService.findOne({id: data['id']});
+        return this.userService.findOne({id});
     }
 
     @UseGuards(AuthGuard)

@@ -9,6 +9,7 @@ import {
     Post,
     Put,
     Query,
+    Req,
     UseGuards,
     UseInterceptors
 } from '@nestjs/common';
@@ -18,13 +19,20 @@ import * as bcrypt from 'bcrypt';
 import {UserCreateDto} from "./models/user-create.dto";
 import {AuthGuard} from "../auth/auth.guard";
 import {Not} from "typeorm";
+import {AuthService} from "../auth/auth.service";
+import {Request} from "express";
+import {UserUpdateInfoDto} from "./models/user-update-info.dto";
+import {UserUpdatePasswordDto} from "./models/user-update-password.dto";
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard)
 @Controller('users')
 export class UserController {
 
-    constructor(private userService: UserService) {
+    constructor(
+        private userService: UserService,
+        private authService: AuthService
+    ) {
     }
 
     @Get()
@@ -51,6 +59,37 @@ export class UserController {
     @Get(':id')
     async get(@Param('id') id: number) {
         return this.userService.findOneOrNotFound({id}, ['role']);
+    }
+
+    @Put('info')
+    async updateInfo(
+        @Req() request: Request,
+        @Body() body: UserUpdateInfoDto
+    ) {
+        const id = await this.authService.userId(request);
+        await this.userService.update(id, body);
+
+        return this.userService.findOne({id});
+    }
+
+    @Put('password')
+    async updatePassword(
+        @Req() request: Request,
+        @Body() body: UserUpdatePasswordDto
+    ) {
+        if (body.password !== body.password_confirm) {
+            throw new BadRequestException(['password do not match']);
+        }
+
+        const id = await this.authService.userId(request);
+
+        const hashed = await bcrypt.hash(body.password, 12);
+
+        await this.userService.update(id, {
+            password: hashed
+        });
+
+        return this.userService.findOne({id});
     }
 
     @Put(':id')
