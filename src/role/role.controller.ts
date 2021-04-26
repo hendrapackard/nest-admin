@@ -2,6 +2,7 @@ import {BadRequestException, Body, Controller, Delete, Get, Param, Post, Put} fr
 import {RoleService} from "./role.service";
 import {Not} from "typeorm";
 import {RoleCreateDto} from "./models/role-create.dto";
+import {HasPermission} from "../permission/has-permission.decorator";
 
 @Controller('roles')
 export class RoleController {
@@ -9,11 +10,13 @@ export class RoleController {
     }
 
     @Get()
+    @HasPermission('roles')
     async all() {
         return this.roleService.all();
     }
 
     @Post()
+    @HasPermission('roles')
     async create(@Body() body: RoleCreateDto) {
         if (await this.roleService.findOne({name: body.name})) {
             throw new BadRequestException(['name has already been taken']);
@@ -26,11 +29,13 @@ export class RoleController {
     }
 
     @Get(':id')
+    @HasPermission('roles')
     async get(@Param('id') id: number) {
         return this.roleService.findOneOrNotFound({id}, ['permissions']);
     }
 
     @Put(':id')
+    @HasPermission('roles')
     async update(
         @Param('id') id: number,
         @Body() body: RoleCreateDto
@@ -54,6 +59,7 @@ export class RoleController {
     }
 
     @Delete(':id')
+    @HasPermission('roles')
     async delete(@Param('id') id: number) {
         const data = await this.roleService.findOneOrNotFound({id});
 

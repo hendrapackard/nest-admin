@@ -23,6 +23,7 @@ import {AuthService} from "../auth/auth.service";
 import {Request} from "express";
 import {UserUpdateInfoDto} from "./models/user-update-info.dto";
 import {UserUpdatePasswordDto} from "./models/user-update-password.dto";
+import {HasPermission} from "../permission/has-permission.decorator";
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard)
@@ -36,11 +37,13 @@ export class UserController {
     }
 
     @Get()
+    @HasPermission('users')
     async all(@Query('page') page = 1) {
         return this.userService.paginate(page, ['role']);
     }
 
     @Post()
+    @HasPermission('users')
     async create(@Body() body: UserCreateDto): Promise<User> {
         if (await this.userService.findOne({email: body.email})) {
             throw new BadRequestException(['email has already been taken']);
@@ -57,6 +60,7 @@ export class UserController {
     }
 
     @Get(':id')
+    @HasPermission('users')
     async get(@Param('id') id: number) {
         return this.userService.findOneOrNotFound({id}, ['role']);
     }
@@ -93,6 +97,7 @@ export class UserController {
     }
 
     @Put(':id')
+    @HasPermission('users')
     async update(
         @Param('id') id: number,
         @Body() body: UserCreateDto
@@ -114,6 +119,7 @@ export class UserController {
     }
 
     @Delete(':id')
+    @HasPermission('users')
     async delete(@Param('id') id: number) {
         const data = await this.userService.findOneOrNotFound({id});
 
