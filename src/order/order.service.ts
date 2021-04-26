@@ -28,4 +28,12 @@ export class OrderService extends AbstractService {
             meta
         }
     }
+
+    async chart() {
+        return this.orderRepository.createQueryBuilder('o')
+            .select(['date(o.created_at) as date', 'sum(oi.price * oi.quantity) as sum'])
+            .innerJoin('order_items', 'oi', 'o.id = oi.order_id')
+            .groupBy('o.created_at')
+            .getRawMany();
+    }
 }
