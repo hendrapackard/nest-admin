@@ -12,7 +12,7 @@ export class RoleController {
     @Get()
     @HasPermission('roles')
     async all() {
-        return this.roleService.all();
+        return this.roleService.paginate();
     }
 
     @Post()

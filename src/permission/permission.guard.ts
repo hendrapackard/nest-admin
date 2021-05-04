@@ -8,32 +8,32 @@ import {Role} from "../role/models/role.entity";
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
-  constructor(
-      private reflector: Reflector,
-      private authService: AuthService,
-      private userService: UserService,
-      private roleService: RoleService
-  ) {
-  }
-
-  async canActivate(context: ExecutionContext) {
-    const access = this.reflector.get<string>('access', context.getHandler());
-    if (!access) {
-      return true;
+    constructor(
+        private reflector: Reflector,
+        private authService: AuthService,
+        private userService: UserService,
+        private roleService: RoleService
+    ) {
     }
 
-    const request = context.switchToHttp().getRequest();
+    async canActivate(context: ExecutionContext) {
+        const access = this.reflector.get<string>('access', context.getHandler());
+        if (!access) {
+            return true;
+        }
 
-    const id = await this.authService.userId(request);
+        const request = context.switchToHttp().getRequest();
 
-    const user: User = await this.userService.findOne({id}, ['role']);
+        const id = await this.authService.userId(request);
 
-    const role: Role = await this.roleService.findOne({id: user.role.id}, ['permissions']);
+        const user: User = await this.userService.findOne({id}, ['role']);
 
-    if (request.method === 'GET') {
-      return role.permissions.some(p => p.name === `view_${access}` || p.name === `edit_${access}`);
+        const role: Role = await this.roleService.findOne({id: user.role.id}, ['permissions']);
+
+        if (request.method === 'GET') {
+            return role.permissions.some(p => (p.name === `view_${access}`) || (p.name === `edit_${access}`));
+        }
+
+        return role.permissions.some(p => p.name === `edit_${access}`);
     }
-
-    return role.permissions.some(p => p.name === `edit_${access}`);
-  }
 }
