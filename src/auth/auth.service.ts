@@ -8,11 +8,15 @@ export class AuthService {
     constructor(private jwtService: JwtService) {
     }
 
-    async userId(request: Request): Promise<number> {
-        const cookie = request.cookies['jwt'];
+    async userId(request: Request): Promise<any> {
+        try {
+            const cookie = request.cookies['jwt'];
 
-        const data = await this.jwtService.verifyAsync(cookie);
+            const data = await this.jwtService.verifyAsync(cookie);
 
-        return data['id'];
+            return data['id'];
+        } catch (e) {
+            return false;
+        }
     }
 }
